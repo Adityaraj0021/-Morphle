@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, redirect
 import subprocess
 import datetime
 import os
@@ -7,31 +7,33 @@ import pytz
 
 app = Flask(__name__)
 
+@app.route('/')
+def index():
+    return redirect('/htop')
+
 @app.route('/htop')
 def htop():
-    # Get username
+    
     username = os.getenv('USER', subprocess.getoutput('whoami'))
     
-    # Get full name (using a fallback if not available)
     try:
-        # Try to get the full name from passwd file
         full_name = subprocess.getoutput("getent passwd $USER | cut -d ':' -f 5 | cut -d ',' -f 1")
         if not full_name or full_name.startswith("getent:"):
-            full_name = "Your Full Name"  # Fallback
+            full_name = "Aditya Raj"  
     except:
-        full_name = "Your Full Name"  # Fallback
+        full_name = "Aditya Raj"  
     
-    # Get server time in IST
+   
     ist_timezone = pytz.timezone('Asia/Kolkata')
     server_time_ist = datetime.datetime.now(ist_timezone).strftime('%Y-%m-%d %H:%M:%S %Z')
     
-    # Get top output
+   
     try:
         top_output = subprocess.check_output(['top', '-b', '-n', '1'], text=True)
     except:
         top_output = "Error fetching top output"
     
-    # HTML template
+    
     html_template = """
     <!DOCTYPE html>
     <html>
